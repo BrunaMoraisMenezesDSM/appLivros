@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Animated, ScrollView } from 'react-native';
 import axios from 'axios';
 
 export default function ViewLivro({ route }) {
@@ -35,7 +35,7 @@ export default function ViewLivro({ route }) {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView scrollEnabled={false} contentContainerStyle={styles.container}>
       {livro && (
         <TouchableOpacity onPress={handleFlip}>
           <Animated.View style={[styles.card, rotateStyle]}>
@@ -47,11 +47,16 @@ export default function ViewLivro({ route }) {
               </View>
             ) : (
               <View style={styles.back}>
-                <Text style={styles.titulo}>{livro.titulo}</Text>
-                <Text style={styles.titles}>Autor: </Text>
+                <Text style={styles.titles}>ID: </Text>
+                <Text style={styles.info}>{livro.id}</Text>
+                <Text style={styles.titles}>Autor Principal: </Text>
                 <Text style={styles.info}>{livro.autorPrincipal}</Text>
+                <Text style={styles.titles}>Autores: </Text>
+                <Text style={styles.info}>{livro.autores}</Text>
                 <Text style={styles.titles}>Ano: </Text>
                 <Text style={styles.info}>{livro.ano}</Text>
+                <Text style={styles.titles}>Edição: </Text>
+                <Text style={styles.info}>{livro.edicao}</Text>
                 <Text style={styles.titles}>Editora: </Text>
                 <Text style={styles.info}>{livro.editora}</Text>
                 <Text style={styles.titles}>Idioma: </Text>
@@ -60,12 +65,14 @@ export default function ViewLivro({ route }) {
                 <Text style={styles.info}>{livro.isbnIssn}</Text>
                 <Text style={styles.titles}>Material: </Text>
                 <Text style={styles.info}>{livro.material}</Text>
+                <Text style={styles.titles}>Obra: </Text>
+                <Text style={styles.info}>{livro.obra}</Text>
               </View>
             )}
           </Animated.View>
         </TouchableOpacity>
       )}
-    </View>
+    </ScrollView>
   );
 }
 
@@ -79,7 +86,7 @@ const styles = StyleSheet.create({
   },
   card: {
     width: 400,
-    height: 550,
+    height: 603,
     backgroundColor: '#FFFFF0',
     borderRadius: 10,
   },
@@ -102,7 +109,7 @@ const styles = StyleSheet.create({
     height: '80%',
   },
   titulo: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: 'bold',
     marginVertical: 10,
     textAlign: 'center',
@@ -110,18 +117,18 @@ const styles = StyleSheet.create({
     color: 'black'
   },
   clickText: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#007AFF',
     marginBottom: 20,
   },
   titles: {
     marginBottom: 2,
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: 'black'
   },
   info: {
-    fontSize: 17,
+    fontSize: 15,
     marginBottom: 14,
     marginRight: 20,
     color: '#4F4F4F',
