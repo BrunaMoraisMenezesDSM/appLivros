@@ -1,35 +1,129 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import axios from 'axios';
 
 export default function ViewLivro({ route }) {
   const { id } = route.params;
   const [livro, setLivro] = useState(null);
+  const [isFlipped, setIsFlipped] = useState(false);
+  const flipAnimation = new Animated.Value(0);
 
   useEffect(() => {
-    fetchLivro();
-  }, []);
+    fetchLivro(id);
+  }, [id]);
 
-  const fetchLivro = async () => {
+  const fetchLivro = async (newId: any) => {
     try {
-      const response = await axios.get(`https://bibliotecaetecmaua.azurewebsites.net/api/LivrosSedeApi/${id}`);
-      setLivro(response.data);
+      const response = await axios.get(`https://bibliotecaetecmaua.azurewebsites.net/api/LivrosSedeApi/${newId}`);
+      const livroData = response.data;
+      livroData.imagem = `https://bibliotecaetecmaua.azurewebsites.net/Content/Images/${livroData.imagem}`;
+      setLivro(livroData);
     } catch (error) {
       console.error("Erro ao buscar livro:", error);
     }
   };
 
+  const handleFlip = () => {
+    setIsFlipped(!isFlipped);
+  };
+
+  const rotateStyle = {
+    transform: [
+      { perspective: 1000 },
+      { rotateY: flipAnimation.interpolate({ inputRange: [0, 180], outputRange: ['0deg', '180deg'] }) },
+    ],
+  };
+
   return (
-    <View>
+    <View style={styles.container}>
       {livro && (
-        <>
-          <Text>{livro.titulo}</Text>
-          <Text>{livro.ano}</Text>          
-          <Text>{livro.editora}</Text>
-          <Text>{livro.autorPrincipal }</Text>
-          <Image source={{ uri: livro.imagem}} style={{ width: 100, height: 100 }} />
-        </>
+        <TouchableOpacity onPress={handleFlip}>
+          <Animated.View style={[styles.card, rotateStyle]}>
+            {!isFlipped ? (
+              <View style={styles.front}>
+                <Image source={{ uri: livro.imagem }} style={styles.image} resizeMode="contain" />
+                <Text style={styles.titulo}>{livro.titulo}</Text>
+                <Text style={styles.clickText}>Clique para ver mais informações</Text>
+              </View>
+            ) : (
+              <View style={styles.back}>
+                <Text style={styles.titulo}>{livro.titulo}</Text>
+                <Text style={styles.titles}>Autor: </Text>
+                <Text style={styles.info}>{livro.autorPrincipal}</Text>
+                <Text style={styles.titles}>Ano: </Text>
+                <Text style={styles.info}>{livro.ano}</Text>
+                <Text style={styles.titles}>Editora: </Text>
+                <Text style={styles.info}>{livro.editora}</Text>
+                <Text style={styles.titles}>Idioma: </Text>
+                <Text style={styles.info}>{livro.idioma}</Text>
+                <Text style={styles.titles}>ISBN/ISSN: </Text>
+                <Text style={styles.info}>{livro.isbnIssn}</Text>
+                <Text style={styles.titles}>Material: </Text>
+                <Text style={styles.info}>{livro.material}</Text>
+              </View>
+            )}
+          </Animated.View>
+        </TouchableOpacity>
       )}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#FFF8DC',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  card: {
+    width: 400,
+    height: 550,
+    backgroundColor: '#FFFFF0',
+    borderRadius: 10,
+  },
+  front: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backfaceVisibility: 'hidden',
+  },
+  back: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+    backfaceVisibility: 'hidden',
+    paddingHorizontal: 20,
+  },
+  image: {
+    marginTop: 10,
+    width: '80%',
+    height: '80%',
+  },
+  titulo: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginVertical: 10,
+    textAlign: 'center',
+    marginBottom: 20,
+    color: 'black'
+  },
+  clickText: {
+    fontSize: 18,
+    color: '#007AFF',
+    marginBottom: 20,
+  },
+  titles: {
+    marginBottom: 2,
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'black'
+  },
+  info: {
+    fontSize: 17,
+    marginBottom: 14,
+    marginRight: 20,
+    color: '#4F4F4F',
+  },
+});
